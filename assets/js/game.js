@@ -30,9 +30,10 @@ var guessedLetters = [];        // Stores the letters the user guessed
 var currentWordIndex;           // Index of the current word in the array
 var guessingWord = [];          // This will be the word we actually build to match the current word
 var remainingGuesses = 0;       // How many tries the player has left
-var gameStarted = false;        // Flag to tell if the game has started
 var hasFinished = false;        // Flag for 'press any key to try again'     
 var wins = 0;                   // How many wins has the player racked up
+
+// Game sounds
 var keySound = new Audio('./assets/sounds/typewriter-key.wav');
 var winSound = new Audio('./assets/sounds/you-win.wav');
 var loseSound = new Audio('./assets/sounds/you-lose.wav');
@@ -40,7 +41,6 @@ var loseSound = new Audio('./assets/sounds/you-lose.wav');
 // Reset our game-level variables
 function resetGame() {
     remainingGuesses = maxTries;
-    gameStarted = false;
 
     // Use Math.floor to round the random number down to the nearest whole.
     currentWordIndex = Math.floor(Math.random() * (selectableWords.length));
@@ -76,13 +76,6 @@ function updateDisplay() {
     }
     document.getElementById("remainingGuesses").innerText = remainingGuesses;
     document.getElementById("guessedLetters").innerText = guessedLetters;
-
-    if(remainingGuesses <= 0) {
-        loseSound.play();
-        document.getElementById("gameover-image").style.cssText = "display: block";
-        document.getElementById("pressKeyTryAgain").style.cssText = "display:block";
-        hasFinished = true;
-    }
 };
 
 
@@ -115,7 +108,7 @@ function evaluateGuess(letter) {
         }
     }
 };
-
+// Checks for a win by seeing if there are any remaining underscores in the guessingword we are building.
 function checkWin() {
     if(guessingWord.indexOf("_") === -1) {
         document.getElementById("youwin-image").style.cssText = "display: block";
@@ -126,13 +119,21 @@ function checkWin() {
     }
 };
 
+
+// Checks for a loss
+function checkLoss()
+{
+    if(remainingGuesses <= 0) {
+        loseSound.play();
+        document.getElementById("gameover-image").style.cssText = "display: block";
+        document.getElementById("pressKeyTryAgain").style.cssText = "display:block";
+        hasFinished = true;
+    }
+}
+
 // Makes a guess
 function makeGuess(letter) {
     if (remainingGuesses > 0) {
-        if (!gameStarted) {
-            gameStarted = true;
-        }
-
         // Make sure we didn't use this letter yet
         if (guessedLetters.indexOf(letter) === -1) {
             guessedLetters.push(letter);
@@ -140,12 +141,10 @@ function makeGuess(letter) {
         }
     }
     
-    updateDisplay();
-    checkWin();
 };
 
 
-
+// Event listener
 document.onkeydown = function(event) {
     // If we finished a game, dump one keystroke and reset.
     if(hasFinished) {
@@ -156,6 +155,9 @@ document.onkeydown = function(event) {
         if(event.keyCode >= 65 && event.keyCode <= 90) {
             keySound.play();
             makeGuess(event.key.toUpperCase());
+            updateDisplay();
+            checkWin();
+            checkLoss();
         }
     }
 };
