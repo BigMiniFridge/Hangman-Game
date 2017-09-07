@@ -70,10 +70,16 @@ function resetGame() {
 function updateDisplay() {
 
     document.getElementById("totalWins").innerText = wins;
-    document.getElementById("currentWord").innerText = "";
+
+    // Display how much of the word we've already guessed on screen.
+    // Printing the array would add commas (,) - so we concatenate a string from each value in the array.
+    var guessingWordText = "";
     for (var i = 0; i < guessingWord.length; i++) {
-        document.getElementById("currentWord").innerText += guessingWord[i];
+        guessingWordText += guessingWord[i];
     }
+
+    //
+    document.getElementById("currentWord").innerText = guessingWordText;
     document.getElementById("remainingGuesses").innerText = remainingGuesses;
     document.getElementById("guessedLetters").innerText = guessedLetters;
 };
